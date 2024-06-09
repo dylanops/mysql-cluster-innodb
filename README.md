@@ -1,4 +1,7 @@
-This show case how to run MySQL cluster with MySQL Router
+This repo is show case how to run MySQL cluster with MySQL Router
+
+![MySQL Cluster](./data/mysql_clusterset.png)
+
 
 ```bash
 docker compose up
