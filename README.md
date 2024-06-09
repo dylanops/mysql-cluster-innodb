@@ -1,7 +1,7 @@
 This show case how to run MySQL cluster with MySQL Router
 
 ```bash
-     docker compose up
+docker compose up
 
 ```
 
