@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+  pm1:
+    image: mysql:8.0-oracle
+    command: ["mysqld","--server_id=1","--default-authentication-plugin=mysql_native_password", "--binlog_transaction_dependency_tracking=WRITESET", "--enforce_gtid_consistency=ON", "--gtid_mode=ON"]
+    container_name: pm1
+    volumes:
+      - ./backup:/var/backup
+      - ./data/pm1:/var/lib/mysql
+    env_file:
+      - mysql.env
+    ports:
+      - 3307:3306
+      - 33067:33060
+    restart: always
+    networks:
+      - app
+  pm2:
+    image: mysql:8.0-oracle
+    command: ["mysqld","--server_id=2","--default-authentication-plugin=mysql_native_password", "--binlog_transaction_dependency_tracking=WRITESET", "--enforce_gtid_consistency=ON", "--gtid_mode=ON"]
+    container_name: pm2
+    volumes:
+      - ./backup:/var/backup
+      - ./data/pm2:/var/lib/mysql
+    env_file:
+      - mysql.env
+    ports:
+      - 3308:3306
+    restart: always
+    networks:
+      - app
+  mysqlsh:
+    # build:
+    #   context: ./
+    #   dockerfile: Dockerfile
+    image: dylanops/mysqlsh
+    container_name: mysqlsh
+    env_file:
+      - mysqlsh.env
+    volumes:
+      - ./scripts:/scripts
+    depends_on:
+      - pm1
+      - pm2
+    networks:
+      - app
+  myrouter:
+    image: mysql/mysql-router:8.0.32
+    container_name: myrouter
+    env_file:
+      - myrouter.env
+    ports:
+      - 6446:6446
+      - 8843:8843
+    depends_on:
+      - pm1
+      - pm2
+      - mysqlsh
+    restart: always
+    networks:
+      - app
+
+networks:
+  app:
+    driver: bridge
